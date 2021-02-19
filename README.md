@@ -42,6 +42,7 @@ module "lambda_api" {
   use_codedeploy                = true
   timeout                       = 3
   memory_size                   = 128
+  use_s3_bucket                 = false
 
   lambda_vpc_config = {
     subnet_ids         = module.acs.private_subnet_ids
@@ -101,6 +102,7 @@ module "lambda_api" {
 | use_codedeploy | bool | If true, CodeDeploy App and Deployment Group will be created and TF will not update alias to point to new versions of the Lambda (becuase CodeDeploy will do that). | false
 | timeout | number | How long the lambda will run (in seconds) before timing out | 3 (same as terraform default)
 | memory_size | number | Size of the memory of the lambda. CPU will scale along with it | 128 (same as terraform default)
+| use_s3_bucket | bool | Toggle whether `lambda_zip_file` uses an s3 bucket address or a file location for source code | false
 
 #### lambda_vpc_config
 

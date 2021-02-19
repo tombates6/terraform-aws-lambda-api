@@ -241,6 +241,35 @@ resource "aws_security_group" "lambda_sg" {
 }
 
 resource "aws_lambda_function" "api_lambda" {
+  count            = var.use_s3_bucket ? 1 : 0
+  s3_bucket        = var.lambda_zip_file
+  source_code_hash = filebase64sha256(var.lambda_zip_file)
+  function_name    = local.long_name
+  role             = aws_iam_role.iam_for_lambda.arn
+  handler          = var.handler
+  runtime          = var.runtime
+  publish          = true
+  timeout          = var.timeout
+  memory_size      = var.memory_size
+
+  dynamic "environment" {
+    for_each = var.environment_variables != null ? [1] : []
+    content {
+      variables = var.environment_variables
+    }
+  }
+
+  dynamic "vpc_config" {
+    for_each = var.lambda_vpc_config == null ? [] : [var.lambda_vpc_config]
+    content {
+      subnet_ids         = var.lambda_vpc_config.subnet_ids
+      security_group_ids = concat([aws_security_group.lambda_sg[0].id], var.lambda_vpc_config.security_group_ids)
+    }
+  }
+}
+
+resource "aws_lambda_function" "api_lambda" {
+  count            = var.use_s3_bucket ? 0 : 1
   filename         = var.lambda_zip_file
   source_code_hash = filebase64sha256(var.lambda_zip_file)
   function_name    = local.long_name

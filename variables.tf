@@ -127,3 +127,9 @@ variable "memory_size" {
   description = "Memory Size of the lambda"
   default     = 128
 }
+
+variable "use_s3_bucket" {
+  type        = bool
+  description = "Toggle whether `lambda_zip_file` uses an s3 bucket address or a file location for source code"
+  default     = false
+}
